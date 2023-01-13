@@ -1,18 +1,22 @@
-from flask import Flask, jsonify, make_response
+from flask import Flask
+from flask_jwt_extended import JWTManager
+from flask_restful import Api
+from config import Config
+from resources.image import FileUpLoadResource
+from resources.posting import PostingResource
+from resources.rekognition import ObjectDetectionResource, PhotoRekognitionResource
 
 app = Flask(__name__)
 
+app.config.from_object(Config)
 
-@app.route("/")
-def hello_from_root():
-    return jsonify(message='Hello from root!')
+jwt = JWTManager(app)
 
+api = Api(app)
+api.add_resource(FileUpLoadResource, '/upload')
+api.add_resource(ObjectDetectionResource, '/object_detection')
+api.add_resource(PhotoRekognitionResource, '/get_photo_labels')
+api.add_resource(PostingResource, '/posting')
 
-@app.route("/hello")
-def hello():
-    return jsonify(message='Hello from path!')
-
-
-@app.errorhandler(404)
-def resource_not_found(e):
-    return make_response(jsonify(error='Not found!'), 404)
+if __name__ == '__main__' :
+    app.run()   
